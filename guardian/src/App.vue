@@ -4,8 +4,8 @@
     <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
     <div>
       <b-jumbotron header="Guardian" lead="Novel Approach to Firefighter Safety">
-        <p>For more information visit website</p>
-        <b-button variant="primary" href="#">More Info</b-button>
+        <!-- <p>For more information visit website</p>
+        <b-button variant="primary" href="#">More Info</b-button> -->
       </b-jumbotron>
     </div>
     <div class="row">

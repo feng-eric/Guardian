@@ -4,12 +4,11 @@ import App from './App.vue'
 
 import BootstrapVue from 'bootstrap-vue'
 
-Vue.use(BootstrapVue)
 
 import firebase from 'firebase'
 
 import VueApexCharts from 'vue-apexcharts'
-
+Vue.use(BootstrapVue)
 Vue.component('apexchart', VueApexCharts)
 
 Vue.config.productionTip = false
