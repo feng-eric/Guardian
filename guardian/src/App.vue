@@ -9,7 +9,6 @@
       </b-jumbotron>
     </div>
     <div class="row">
-       <b-alert show>Default Alert</b-alert>
             <div class="col-sm-6"> <!-- Temperature Column -->
                 <div class="card text-white bg-warning mb-3" style="max-width: 18rem;">
                     <div style="font-size: 20px;" class="card-header">Temperature</div>
@@ -55,9 +54,6 @@
             <div id="chart">
               <!--  -->
               <apexchart ref="realtimeChart" type=line height=350 :options="options" :series="series" />
-            </div>
-            <div>
-              <b-alert>AHH</b-alert>
             </div>
     </div>
 

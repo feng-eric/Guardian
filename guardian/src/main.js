@@ -2,9 +2,6 @@ import Vue from 'vue'
 import { firestorePlugin } from 'vuefire'
 import App from './App.vue'
 
-import BootstrapVue from 'bootstrap-vue'
-
-
 import firebase from 'firebase'
 // import ApexCharts from 'apexcharts'
 // import VueApexCharts from 'vue-apexcharts'
