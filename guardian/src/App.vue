@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <div>
-      <b-jumbotron header="Guardian" lead="Novel Approach to Firefighter Safety">
-        <img src="https://image.flaticon.com/icons/svg/206/206877.svg" height="200px"></img>
+      <b-jumbotron header="Guardian" style="width: 50%; margin: 0 auto; opacity: 0.9;" lead="Novel Approach to Firefighter Safety">
+        <img style="opacity: 1" src="https://image.flaticon.com/icons/svg/206/206877.svg" height="200px"></img>
         <!-- <p>For more information visit website</p>
         <b-button variant="primary" href="#">More Info</b-button> -->
       </b-jumbotron>
@@ -211,6 +211,7 @@ export default {
 
 <style>
 body{
+
 background-image: url("background2.jpg");
 background-repeat: no-repeat;
 height: 100%;
@@ -226,4 +227,8 @@ background-size: cover;
   color: #2c3e50;
   margin-top: 60px;
 }
+ b-jumbotron {
+  width: 50%;
+  }
+
 </style>
