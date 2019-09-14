@@ -20,7 +20,7 @@
                         Click to see chart
                       </div>   -->
                       <div class="card-body">
-                          <h1 id="temperature" style="font-size: 75px;" class="card-title"> {{temperature}}°C</h1>
+                          <h1 id="temperature" style="font-size: 75px;" class="card-title"> {{temperatureData[temperatureData.length - 1].y}}°C</h1>
                           <p class="card-text">Temperature expressed in Celsius degree.</p>
                       </div>
                     </div>
@@ -41,12 +41,12 @@
                       :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
                     <div v-if="showHumidity">
                       <div class="card-body">
-                          <h1 id="humidity" style="font-size: 75px;" class="card-title"> {{humidity}}<span>%</span></h1>
+                          <h1 id="humidity" style="font-size: 75px;" class="card-title"><span> {{humidityData[humidityData.length - 1].y}}%</span></h1>
                           <p class="card-text">Relative humidity, expressed in percentage.</p>
                       </div>
                     </div>
                     <div v-else>
-                      <apexchart width="500" type="line" :options="options" :series="series"></apexchart>
+                      <apexchart ref="humidityChart" width="500" type="line" :options="options" :series="series"></apexchart>
                     </div>
                 </div>
             </div>
@@ -56,9 +56,9 @@
             </div>
     </div>
 
-      <div id="chart">
+      <!-- <div id="chart">
       <apexchart type=radialBar height=350 :options="temperatureChart.chartOptions" :series="tempSeries[0].data" />
-    </div>
+    </div> -->
 
   </div>
 </template>
@@ -77,10 +77,9 @@ export default {
   data() {
     return {
       temperatureData: [],
+      humidityData: [],
       showTemperature: true,
       showHumidity: true,
-      temperature: '',
-      humidity: '',
       toggleButtonWidth: 100,
       options: {
         chart: {
@@ -92,52 +91,52 @@ export default {
       },
       series: [{
         name: 'series-1',
-        data: [34, 53]
+        data: this.temperatureData
       }],
       tempSeries: [{
         name: 'Temperature Chart',
         data: [50]
-      }],
-      temperatureChart: {
-        chartOptions: {
-          plotOptions: {
-            radialBar: {
-              startAngle: -120,
-              endAngle: 1,
-              dataLabels: {
-                name: {
-                  fontSize: '16px',
-                  color: undefined,
-                  offsetY: 120
-                },
-                value: {
-                  offsetY: 76,
-                  fontSize: '22px',
-                  color: undefined,
-                  formatter: function (val) {
-                    return val + "°C";
-                  }
-                }
-              }
-            }
-          },
-          fill: {
-            type: 'gradient',
-            gradient: {
-              shade: 'dark',
-              shadeIntensity: 0.15,
-              inverseColors: false,
-              opacityFrom: 1,
-              opacityTo: 1,
-              stops: [0, 50, 65, 91]
-            },
-          },
-          stroke: {
-            dashArray: 4
-          },
-          labels: ['Median Ratio']
-        }
-      }
+      }]
+      // temperatureChart: {
+      //   chartOptions: {
+      //     plotOptions: {
+      //       radialBar: {
+      //         startAngle: -120,
+      //         endAngle: 1,
+      //         dataLabels: {
+      //           name: {
+      //             fontSize: '16px',
+      //             color: undefined,
+      //             offsetY: 120
+      //           },
+      //           value: {
+      //             offsetY: 76,
+      //             fontSize: '22px',
+      //             color: undefined,
+      //             formatter: function (val) {
+      //               return val + "°C";
+      //             }
+      //           }
+      //         }
+      //       }
+      //     },
+      //     fill: {
+      //       type: 'gradient',
+      //       gradient: {
+      //         shade: 'dark',
+      //         shadeIntensity: 0.15,
+      //         inverseColors: false,
+      //         opacityFrom: 1,
+      //         opacityTo: 1,
+      //         stops: [0, 50, 65, 91]
+      //       },
+      //     },
+      //     stroke: {
+      //       dashArray: 4
+      //     },
+      //     labels: ['Median Ratio']
+      //   }
+      // }
     }
   },
 
@@ -150,12 +149,7 @@ export default {
     tempRef.limitToLast(1).on('value', querySnapshot => {
       let data = querySnapshot.val();
       let value = Object.values(data)
-      console.log(value.toString())
-      console.log("temp array before")
-      console.log(this.temperatureData)
-      console.log("temp array after")
-      // this.temperatureData.push(value.toString())
-      console.log(this.temperatureData)
+
       var date = new Date()
       var hours = date.getHours()
       var minutes = date.getMinutes()
@@ -171,27 +165,32 @@ export default {
       this.$refs.realtimeChart.updateSeries([{
         data: this.temperatureData
       }])
-      // getNewSeries(lastDate, {
-      //   min: 20,
-      //   max: 90
-      // })
-      // chart.updateSeries([{
-      //   data: value
-      // }])
-      console.log("temperature: " + value);
-      this.temperature = value.toString();
-      const newData = [parseFloat(value)]
-      this.tempSeries = [{
-        data: newData
-      }]
     });
 
     humRef.limitToLast(1).on('value', querySnapshot => {
       let data = querySnapshot.val();
       let value = Object.values(data)
       
+      
+      var date = new Date()
+      var hours = date.getHours()
+      var minutes = date.getMinutes()
+      var seconds = date.getSeconds()
+      if (seconds < 10) {
+        seconds = "0" + seconds.toString()
+      }
+      var time = hours + ":" + minutes + ":" + seconds
+      this.humidityData.push({ x : time, y : value.toString()})
+      if (this.humidityData.length > 8) {
+        this.humidityData = this.humidityData.slice(this.humidityData.length - 8, this.humidityData.length)
+      }
+      this.$refs.humidityChart.updateSeries([{
+        data: this.humidityData
+      }])
+
+
       console.log("humidity: " + value);
-      this.humidity = value.toString();
+     // this.humidity = value.toString();
     });
 
     
@@ -211,7 +210,15 @@ export default {
 </script>
 
 <style>
+body{
+background-image: url("background2.jpg");
+background-repeat: no-repeat;
+height: 100%;
+width: 100%;
+background-size: cover;
+}
 #app {
+  
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
