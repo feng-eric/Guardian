@@ -28,7 +28,7 @@
                       <!-- <div @click=toggleTemperature>
                         Click to see current data
                       </div>   -->
-                        <apexchart ref="realtimeChart" type=line :options="options" :series="series" />
+                        <apexchart ref="temperatureChart" type=line :options="options" :series="tempSeries" />
                     </div>
                 </div>
             </div>
@@ -50,7 +50,7 @@
                       </div>
                     </div>
                     <div v-else>
-                      <apexchart width="500" type="line" :options="options" :series="series"></apexchart>
+                      <apexchart width="500" type="line" :options="options" :series="tempSeries"></apexchart>
                     </div>
                 </div>
             </div>
@@ -64,12 +64,12 @@
                       :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
                     <div v-if="showCarbonDioxide">
                       <div class="card-body">
-                          <h1 id="carbonDioxide" style="font-size: 75px;" class="card-title"> {{carbonDioxide}}<span>%</span></h1>
+                          <h1 id="carbonDioxide" style="font-size: 75px;" class="card-title"> {{carbonDioxideData[carbonDioxideData.length-1].y}}<span>%</span></h1>
                           <p class="card-text">DESCRIPTION</p>
                       </div>
                     </div>
                     <div v-else>
-                      <apexchart width="500" type="line" :options="options" :series="series"></apexchart>
+                      <apexchart ref="carbonDioxideChart" type=line :options="options" :series="carbonDioxideSeries" />
                     </div>
                 </div>
             </div>
@@ -83,22 +83,16 @@
                       :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
                     <div v-if="showTotalVolatileOrganicCompound">
                       <div class="card-body">
-                          <h1 id="totalVolatileOrganicCompound" style="font-size: 75px;" class="card-title"> {{totalVolatileOrganicCompound}}<span>%</span></h1>
+                          <h1 id="totalVolatileOrganicCompound" style="font-size: 75px;" class="card-title"> {{totalVolatileOrganicCompoundData[totalVolatileOrganicCompoundData.length-1].y}}<span>%</span></h1>
                           <p class="card-text">DESCRIPTION</p>
                       </div>
                     </div>
                     <div v-else>
-                      <apexchart width="500" type="line" :options="options" :series="series"></apexchart>
+                      <apexchart ref="totalVolatileOrganicChart" type=line :options="options" :series="totalVolatileOrganicCompoundSeries" />
                     </div>
                 </div>
             </div>
-            
     </div>
-
-      <div id="chart">
-      <apexchart type=radialBar height=350 :options="temperatureChart.chartOptions" :series="tempSeries[0].data" />
-    </div>
-
   </div>
 </template>
 
@@ -116,6 +110,8 @@ export default {
   data() {
     return {
       temperatureData: [],
+      carbonDioxideData: [],
+      totalVolatileOrganicCompoundData: [],
       showTemperature: true,
       showHumidity: true,
       showCarbonDioxide: true,
@@ -130,57 +126,20 @@ export default {
           id: 'vuechart-example'
         },
         xaxis: {
-          // categories: [1,2, 3, 4, 5, 6, 7, 8]
         }
       },
-      series: [{
-        name: 'series-1',
-        data: [34, 53]
-      }],
       tempSeries: [{
-        name: 'Temperature Chart',
-        data: [50]
+        name: 'series-1',
+        data: [0]
       }],
-      temperatureChart: {
-        chartOptions: {
-          plotOptions: {
-            radialBar: {
-              startAngle: -120,
-              endAngle: 1,
-              dataLabels: {
-                name: {
-                  fontSize: '16px',
-                  color: undefined,
-                  offsetY: 120
-                },
-                value: {
-                  offsetY: 76,
-                  fontSize: '22px',
-                  color: undefined,
-                  formatter: function (val) {
-                    return val + "°C";
-                  }
-                }
-              }
-            }
-          },
-          fill: {
-            type: 'gradient',
-            gradient: {
-              shade: 'dark',
-              shadeIntensity: 0.15,
-              inverseColors: false,
-              opacityFrom: 1,
-              opacityTo: 1,
-              stops: [0, 50, 65, 91]
-            },
-          },
-          stroke: {
-            dashArray: 4
-          },
-          labels: ['Median Ratio']
-        }
-      },
+      carbonDioxideSeries: [{
+        name: 'series-3',
+        data: [0]
+      }],
+      totalVolatileOrganicCompoundSeries: [{
+        name: 'series-4',
+        data: [0]
+      }],
       showDismissibleAlert: false
     }
   },
@@ -196,12 +155,7 @@ export default {
     tempRef.limitToLast(1).on('value', querySnapshot => {
       let data = querySnapshot.val();
       let value = Object.values(data)
-      console.log(value.toString())
-      console.log("temp array before")
-      console.log(this.temperatureData)
-      console.log("temp array after")
-      // this.temperatureData.push(value.toString())
-      console.log(this.temperatureData)
+    
       if (this.temperatureData > 25) {
         this.showDismissibleAlert = true;
       } else {
@@ -219,24 +173,10 @@ export default {
       if (this.temperatureData.length > 8) {
         this.temperatureData = this.temperatureData.slice(this.temperatureData.length - 8, this.temperatureData.length)
       }
-      this.$refs.realtimeChart.updateSeries([{
+      this.$refs.temperatureChart.updateSeries([{
         data: this.temperatureData
       }])
 
-      
-      // getNewSeries(lastDate, {
-      //   min: 20,
-      //   max: 90
-      // })
-      // chart.updateSeries([{
-      //   data: value
-      // }])
-      console.log("temperature: " + value);
-      this.temperature = value.toString();
-      const newData = [parseFloat(value)]
-      this.tempSeries = [{
-        data: newData
-      }]
     });
 
     humRef.limitToLast(1).on('value', querySnapshot => {
@@ -250,17 +190,41 @@ export default {
     coRef.limitToLast(1).on('value', querySnapshot => {
       let data = querySnapshot.val();
       let value = Object.values(data)
-      
-      console.log("carbon dioxide: " + value);
-      this.carbonDioxide = value.toString();
+      var date = new Date()
+      var hours = date.getHours()
+      var minutes = date.getMinutes()
+      var seconds = date.getSeconds()
+      if (seconds < 10) {
+        seconds = "0" + seconds.toString()
+      }
+      var time = hours + ":" + minutes + ":" + seconds
+      this.carbonDioxideData.push({ x : time, y : value.toString()})
+      if (this.carbonDioxideData.length > 8) {
+        this.carbonDioxideData = this.carbonDioxideData.slice(this.carbonDioxideData.length - 8, this.carbonDioxideData.length)
+      }
+      this.$refs.carbonDioxideChart.updateSeries([{
+        data: this.carbonDioxideData
+      }])
     });
 
     tvocRef.limitToLast(1).on('value', querySnapshot => {
       let data = querySnapshot.val();
       let value = Object.values(data)
-      
-      console.log("total volatile organic compound: " + value);
-      this.totalVolatileOrganicCompound = value.toString();
+      var date = new Date()
+      var hours = date.getHours()
+      var minutes = date.getMinutes()
+      var seconds = date.getSeconds()
+      if (seconds < 10) {
+        seconds = "0" + seconds.toString()
+      }
+      var time = hours + ":" + minutes + ":" + seconds
+      this.totalVolatileOrganicCompoundData.push({ x : time, y : value.toString()})
+      if (this.totalVolatileOrganicCompoundData.length > 8) {
+        this.totalVolatileOrganicCompoundData = this.totalVolatileOrganicCompoundData.slice(this.totalVolatileOrganicCompoundData.length - 8, this.totalVolatileOrganicCompoundData.length)
+      }
+      this.$refs.totalVolatileOrganicChart.updateSeries([{
+        data: this.totalVolatileOrganicCompoundData
+      }])
     });    
 
   },
