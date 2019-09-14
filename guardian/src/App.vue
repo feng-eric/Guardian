@@ -141,8 +141,8 @@ export default {
   },
 
   created() {
-    const tempRef = database.ref('dht11').child('temperature')
-    const humRef = database.ref('dht11').child('humidity')
+    const tempRef = database.ref('DHT11').child('temperature')
+    const humRef = database.ref('DHT11').child('humidity')
     //tempRef.remove();
     //humRef.remove();
 
