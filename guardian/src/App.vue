@@ -2,7 +2,12 @@
   <div id="app">
     <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
     <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
-
+    <div>
+      <b-jumbotron header="Guardian" lead="Novel Approach to Firefighter Safety">
+        <!-- <p>For more information visit website</p>
+        <b-button variant="primary" href="#">More Info</b-button> -->
+      </b-jumbotron>
+    </div>
     <div class="row">
        <b-alert show>Default Alert</b-alert>
             <div class="col-sm-6"> <!-- Temperature Column -->
@@ -55,7 +60,11 @@
               <b-alert>AHH</b-alert>
             </div>
     </div>
-<b-table striped hover :items="items"></b-table>
+
+      <div id="chart">
+      <apexchart type=radialBar height=350 :options="temperatureChart.chartOptions" :series="tempSeries[0].data" />
+    </div>
+
   </div>
 </template>
 
@@ -63,10 +72,7 @@
 import HelloWorld from './components/HelloWorld.vue'
 import firebase from 'firebase'
 import {database} from './main'
-// import ApexCharts from 'apexcharts'
-// import VueApexCharts from 'vue-apexcharts'
-// import Vue from 'vue'
-// Vue.component('apexchart', VueApexCharts);
+
 export default {
   name: 'app',
   components: {
@@ -93,13 +99,50 @@ export default {
         name: 'series-1',
         data: [34, 53]
       }],
-      items: [
-          { age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-          { age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-          { age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-          { age: 38, first_name: 'Jami', last_name: 'Carney' }
-        ]
- 
+      tempSeries: [{
+        name: 'Temperature Chart',
+        data: [50]
+      }],
+      temperatureChart: {
+        chartOptions: {
+          plotOptions: {
+            radialBar: {
+              startAngle: -120,
+              endAngle: 1,
+              dataLabels: {
+                name: {
+                  fontSize: '16px',
+                  color: undefined,
+                  offsetY: 120
+                },
+                value: {
+                  offsetY: 76,
+                  fontSize: '22px',
+                  color: undefined,
+                  formatter: function (val) {
+                    return val + "°C";
+                  }
+                }
+              }
+            }
+          },
+          fill: {
+            type: 'gradient',
+            gradient: {
+              shade: 'dark',
+              shadeIntensity: 0.15,
+              inverseColors: false,
+              opacityFrom: 1,
+              opacityTo: 1,
+              stops: [0, 50, 65, 91]
+            },
+          },
+          stroke: {
+            dashArray: 4
+          },
+          labels: ['Median Ratio']
+        }
+      }
     }
   },
 
@@ -130,6 +173,10 @@ export default {
       // }])
       console.log("temperature: " + value);
       this.temperature = value.toString();
+      const newData = [parseFloat(value)]
+      this.tempSeries = [{
+        data: newData
+      }]
     });
 
     humRef.limitToLast(1).on('value', querySnapshot => {
