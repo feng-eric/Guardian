@@ -1,0 +1,50 @@
+{
+    "name": "SparkFun CCS811 Arduino Library", 
+    "version": "1.0.7", 
+    "keywords": [
+        "sensors"
+    ], 
+    "description": "An Arduino library to drive the AMS CCS811 by I2C.", 
+    "frameworks": [
+        "arduino"
+    ], 
+    "platforms": [
+        "atmelavr", 
+        "atmelsam", 
+        "espressif32", 
+        "espressif8266", 
+        "intel_arc32", 
+        "microchippic32", 
+        "nordicnrf51", 
+        "nordicnrf52", 
+        "ststm32", 
+        "ststm8", 
+        "teensy", 
+        "timsp430"
+    ], 
+    "authors": [
+        {
+            "email": "techsupport@sparkfun.com", 
+            "url": null, 
+            "maintainer": true, 
+            "name": "SparkFun Electronics"
+        }
+    ], 
+    "repository": {
+        "type": "git", 
+        "url": "https://github.com/sparkfun/SparkFun_CCS811_Arduino_Library"
+    }, 
+    "homepage": null, 
+    "export": {
+        "include": null, 
+        "exclude": [
+            "extras", 
+            "docs", 
+            "tests", 
+            "test", 
+            "*.doxyfile", 
+            "*.pdf"
+        ]
+    }, 
+    "id": 1626
+}

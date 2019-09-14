@@ -1,19 +1,23 @@
 #include <Arduino.h>
-//#include <Adafruit_VEML6070.h>
+#include <Adafruit_CCS811.h>
+#include <Adafruit_VEML6070.h>
 #include <DHT.h>
 #include <DHT_U.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <FirebaseArduino.h>
+#include <SparkFunCCS811.h>
+#include <Wire.h>
 
 #include "Credentials.h"
 
-#define TEST
-//#define DHT_TEST
+//#define TEST
+#define DHT_TEST
 //#define ULTRASONIC_TEST
+#define CCS811_TEST
 
 // DHT11 Variables
-#define DHT_PIN D2
+#define DHT_PIN D3
 #define DHT_TYPE DHT11
 
 DHT dht(DHT_PIN, DHT_TYPE);
@@ -23,11 +27,14 @@ DHT dht(DHT_PIN, DHT_TYPE);
 //#define TRIG_PIN D4
 //#define ECHO_PIN D3
 
-const int trig_pin = 0;
-const int echo_pin = 2;
+//const int trig_pin = 0;
+//const int echo_pin = 2;
 
 long duration;
 long distance;
+
+#define CSS811_ADDR 0x5B
+CCS811 ccs811(CSS811_ADDR);
 
 void ConnectToWiFi()
 {
@@ -60,6 +67,7 @@ void ConnectToWiFi()
 void setup() 
 {
   Serial.begin(115200);
+  Wire.begin();
 
   // ESP8266
   ConnectToWiFi();
@@ -71,15 +79,18 @@ void setup()
 
   
   // Ultrasonic Range Finder
-  pinMode(trig_pin, OUTPUT);
-  pinMode(echo_pin, INPUT);
+  //pinMode(trig_pin, OUTPUT);
+  //pinMode(echo_pin, INPUT);
+
+  //CCS811
+  ccs811.begin();
 }
 
 void loop() 
 {
 #ifdef TEST
   // === Push temperature value to Firebase ===
-  String tempValueID = Firebase.pushInt("dht11/temperature", random(0, 80));
+  String tempValueID = Firebase.pushInt("dht11/temperature", random(20, 30));
   Serial.print("[INFO] temperature: ");
   Serial.println(random(0, 80));
   if (Firebase.failed()) 
@@ -122,27 +133,27 @@ void loop()
   if ((t >= -15 && t <= 80) && (h >= 0 && h <= 100)) 
   {
     // === Push temperature value to Firebase ===
-    String tempValueID = Firebase.pushFloat("dht11/temperature", t);
+    String tempValueID = Firebase.pushFloat("DHT11/temperature", t);
     if (Firebase.failed()) 
     {
-        Serial.print("[ERROR] pushing /dht11/temperature failed:");
+        Serial.print("[ERROR] pushing /DHT11/temperature failed:");
         Serial.println(Firebase.error());
         return;
     }
 
-    Serial.print("[INFO] pushed: /dht11/temperature \tkey: ");
+    Serial.print("[INFO] pushed: /DHT11/temperature \tkey: ");
     Serial.println(tempValueID);
 
     // === Push humidity value to Firebase ===
-    String humValueID = Firebase.pushFloat("dht11/humidity", h);
+    String humValueID = Firebase.pushFloat("DHT11/humidity", h);
     if (Firebase.failed()) 
     {
-        Serial.print("[ERROR] pushing /dht11/humidity failed:");
+        Serial.print("[ERROR] pushing /DHT11/humidity failed:");
         Serial.println(Firebase.error());
         return;
     }
 
-    Serial.print("[INFO] pushed: /dht11/humidity    \tkey: ");
+    Serial.print("[INFO] pushed: /DHT11/humidity    \tkey: ");
     Serial.println(humValueID);
     Serial.println();
   } 
@@ -170,6 +181,48 @@ void loop()
   
   #endif
 
+#ifdef CCS811_TEST
+  if (ccs811.dataAvailable())
+  {
+    ccs811.readAlgorithmResults();
+    int tempCO2 = ccs811.getCO2();
+    int tempTVOC = ccs811.getTVOC();
+    Serial.print("[INFO] CO2: ");
+    Serial.print(tempCO2);
+    Serial.println();
+    Serial.print("[INFO] TVOC: ");
+    Serial.print(tempTVOC);
+    Serial.println();
+
+    // Push CO2 reading to Firebase
+    String CO2ValueID = Firebase.pushFloat("CCS811/CO2", tempCO2);
+    if (Firebase.failed()) 
+    {
+        Serial.print("[ERROR] pushing /CCS811/CO2 failed:");
+        Serial.println(Firebase.error());
+        return;
+    }
+    Serial.print("[INFO] pushed: /CCS811/CO2 \tkey: ");
+    Serial.println(CO2ValueID);
+
+    // Push TVOC reading to Firebase
+    String TVOCValueID = Firebase.pushFloat("CCS811/TVOC", tempTVOC);
+    if (Firebase.failed()) 
+    {
+        Serial.print("[ERROR] pushing /CCS811/TVOC failed:");
+        Serial.println(Firebase.error());
+        return;
+    }
+    Serial.print("[INFO] pushed: /CCS811/TVOC \tkey: ");
+    Serial.println(TVOCValueID);
+  }
+  else if (ccs811.checkForStatusError())
+  {
+    Serial.print("[ERROR] Cannot print values");
+    Serial.println();
+    //while(1);
+  }
+#endif
   delay(1000);
 
 }
