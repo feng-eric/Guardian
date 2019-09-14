@@ -9,7 +9,7 @@
     </div>
     <div class="row">
             <div class="col-sm-6"> <!-- Temperature Column -->
-                <div class="card text-white bg-warning mb-3" style="max-width: 18rem;">
+                <div class="card text-white bg-warning mb-3" height=1000px style="max-width: 18rem;">
                     <div style="font-size: 20px;" class="card-header">Temperature</div>
                     <ToggleButton 
                       @change="toggleTemperature"
@@ -20,7 +20,7 @@
                         Click to see chart
                       </div>   -->
                       <div class="card-body">
-                          <h1 id="temperature" style="font-size: 75px;" class="card-title"> {{temperature}}°C</h1>
+                          <h1 id="temperature" style="font-size: 75px;" class="card-title"> {{temperatureData[temperatureData.length-1].y}}°C</h1>
                           <p class="card-text">Temperature expressed in Celsius degree.</p>
                       </div>
                     </div>
@@ -28,7 +28,7 @@
                       <!-- <div @click=toggleTemperature>
                         Click to see current data
                       </div>   -->
-                      <apexchart width="500" type="line" :options="options" :series="series"></apexchart>
+                        <apexchart ref="realtimeChart" type=line :options="options" :series="series" />
                     </div>
                 </div>
             </div>
@@ -51,8 +51,7 @@
                 </div>
             </div>
             <div id="chart">
-              <!--  -->
-              <apexchart ref="realtimeChart" type=line height=400 width=500 :options="options" :series="series" />
+              <!-- <apexchart ref="realtimeChart" type=line height=400 width=500 :options="options" :series="series" /> -->
             </div>
     </div>
 
