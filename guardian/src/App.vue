@@ -56,7 +56,7 @@
             </div>
 
             <div class="col-sm-6"> <!-- Carbon Dioxide Column -->
-                <div class="card text-white bg-primary mb-3" style="max-width: 18rem;">
+                <div class="card text-black bg-light mb-3" style="max-width: 18rem;">
                     <div style="font-size: 20px;" class="card-header">Carbon Dioxide</div>
                      <ToggleButton 
                       @change="toggleCarbonDioxide"
@@ -75,7 +75,7 @@
             </div>
 
              <div class="col-sm-6"> <!-- Total Volatile Column -->
-                <div class="card text-white bg-primary mb-3" style="max-width: 18rem;">
+                <div class="card text-black bg-success mb-3" style="max-width: 18rem;">
                     <div style="font-size: 20px;" class="card-header">Total Volatile Organic Compound</div>
                      <ToggleButton 
                       @change="toggleTotalVolatileOrganicCompound"
