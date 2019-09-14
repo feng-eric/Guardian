@@ -4,6 +4,7 @@
     <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
     <div>
       <b-jumbotron header="Guardian" lead="Novel Approach to Firefighter Safety">
+        <img src="https://image.flaticon.com/icons/svg/206/206877.svg" height="200px"></img>
         <!-- <p>For more information visit website</p>
         <b-button variant="primary" href="#">More Info</b-button> -->
       </b-jumbotron>
@@ -53,7 +54,7 @@
             </div>
             <div id="chart">
               <!--  -->
-              <apexchart ref="realtimeChart" type=line height=350 :options="options" :series="series" />
+              <apexchart ref="realtimeChart" type=line height=400 width=500 :options="options" :series="series" />
             </div>
     </div>
 
@@ -88,7 +89,7 @@ export default {
           id: 'vuechart-example'
         },
         xaxis: {
-          categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
+          categories: [1,2, 3, 4, 5, 6, 7, 8]
         }
       },
       series: [{
@@ -157,6 +158,9 @@ export default {
       console.log("temp array after")
       this.temperatureData.push(value.toString())
       console.log(this.temperatureData)
+      if (this.temperatureData.length > 8) {
+        this.temperatureData = this.temperatureData.slice(this.temperatureData.length - 8, this.temperatureData.length)
+      }
       this.$refs.realtimeChart.updateSeries([{
         data: this.temperatureData
       }])
