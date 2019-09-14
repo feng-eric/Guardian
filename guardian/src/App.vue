@@ -1,7 +1,5 @@
 <template>
   <div id="app">
-    <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-    <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
     <div>
       <b-jumbotron header="Guardian" lead="Novel Approach to Firefighter Safety">
         <img src="https://image.flaticon.com/icons/svg/206/206877.svg" height="200px"></img>
@@ -89,7 +87,7 @@ export default {
           id: 'vuechart-example'
         },
         xaxis: {
-          categories: [1,2, 3, 4, 5, 6, 7, 8]
+          // categories: [1,2, 3, 4, 5, 6, 7, 8]
         }
       },
       series: [{
@@ -156,8 +154,17 @@ export default {
       console.log("temp array before")
       console.log(this.temperatureData)
       console.log("temp array after")
-      this.temperatureData.push(value.toString())
+      // this.temperatureData.push(value.toString())
       console.log(this.temperatureData)
+      var date = new Date()
+      var hours = date.getHours()
+      var minutes = date.getMinutes()
+      var seconds = date.getSeconds()
+      if (seconds < 10) {
+        seconds = "0" + seconds.toString()
+      }
+      var time = hours + ":" + minutes + ":" + seconds
+      this.temperatureData.push({ x : time, y : value.toString()})
       if (this.temperatureData.length > 8) {
         this.temperatureData = this.temperatureData.slice(this.temperatureData.length - 8, this.temperatureData.length)
       }
