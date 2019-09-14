@@ -32,6 +32,10 @@
                     </div>
                 </div>
             </div>
+             <b-alert v-model="showDismissibleAlert" variant="danger">
+                High Temperature
+             </b-alert>
+             
             <div class="col-sm-6"> <!-- Humidity Column -->
                 <div class="card text-white bg-primary mb-3" style="max-width: 18rem;">
                     <div style="font-size: 20px;" class="card-header">Humidity</div>
@@ -50,9 +54,45 @@
                     </div>
                 </div>
             </div>
-            <div id="chart">
-              <!-- <apexchart ref="realtimeChart" type=line height=400 width=500 :options="options" :series="series" /> -->
+
+            <div class="col-sm-6"> <!-- Carbon Dioxide Column -->
+                <div class="card text-white bg-primary mb-3" style="max-width: 18rem;">
+                    <div style="font-size: 20px;" class="card-header">Carbon Dioxide</div>
+                     <ToggleButton 
+                      @change="toggleCarbonDioxide"
+                      :width="toggleButtonWidth"
+                      :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
+                    <div v-if="showCarbonDioxide">
+                      <div class="card-body">
+                          <h1 id="carbonDioxide" style="font-size: 75px;" class="card-title"> {{carbonDioxide}}<span>%</span></h1>
+                          <p class="card-text">DESCRIPTION</p>
+                      </div>
+                    </div>
+                    <div v-else>
+                      <apexchart width="500" type="line" :options="options" :series="series"></apexchart>
+                    </div>
+                </div>
             </div>
+
+             <div class="col-sm-6"> <!-- Total Volatile Column -->
+                <div class="card text-white bg-primary mb-3" style="max-width: 18rem;">
+                    <div style="font-size: 20px;" class="card-header">Total Volatile Organic Compound</div>
+                     <ToggleButton 
+                      @change="toggleTotalVolatileOrganicCompound"
+                      :width="toggleButtonWidth"
+                      :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
+                    <div v-if="showTotalVolatileOrganicCompound">
+                      <div class="card-body">
+                          <h1 id="totalVolatileOrganicCompound" style="font-size: 75px;" class="card-title"> {{totalVolatileOrganicCompound}}<span>%</span></h1>
+                          <p class="card-text">DESCRIPTION</p>
+                      </div>
+                    </div>
+                    <div v-else>
+                      <apexchart width="500" type="line" :options="options" :series="series"></apexchart>
+                    </div>
+                </div>
+            </div>
+            
     </div>
 
       <div id="chart">
@@ -78,8 +118,12 @@ export default {
       temperatureData: [],
       showTemperature: true,
       showHumidity: true,
+      showCarbonDioxide: true,
+      showTotalVolatileOrganicCompound: true,
       temperature: '',
       humidity: '',
+      carbonDioxide: '',
+      totalVolatileOrganicCompound: '',
       toggleButtonWidth: 100,
       options: {
         chart: {
@@ -136,13 +180,16 @@ export default {
           },
           labels: ['Median Ratio']
         }
-      }
+      },
+      showDismissibleAlert: false
     }
   },
 
   created() {
-    const tempRef = database.ref('dht11').child('temperature')
-    const humRef = database.ref('dht11').child('humidity')
+    const tempRef = database.ref('DHT11').child('temperature')
+    const humRef = database.ref('DHT11').child('humidity')
+    const coRef = database.ref('CCS811').child('CO2')
+    const tvocRef = database.ref('CCS811').child('TVOC')
     //tempRef.remove();
     //humRef.remove();
 
@@ -155,6 +202,11 @@ export default {
       console.log("temp array after")
       // this.temperatureData.push(value.toString())
       console.log(this.temperatureData)
+      if (this.temperatureData > 25) {
+        this.showDismissibleAlert = true;
+      } else {
+        this.showDismissibleAlert = false;
+      }
       var date = new Date()
       var hours = date.getHours()
       var minutes = date.getMinutes()
@@ -170,6 +222,8 @@ export default {
       this.$refs.realtimeChart.updateSeries([{
         data: this.temperatureData
       }])
+
+      
       // getNewSeries(lastDate, {
       //   min: 20,
       //   max: 90
@@ -193,7 +247,21 @@ export default {
       this.humidity = value.toString();
     });
 
-    
+    coRef.limitToLast(1).on('value', querySnapshot => {
+      let data = querySnapshot.val();
+      let value = Object.values(data)
+      
+      console.log("carbon dioxide: " + value);
+      this.carbonDioxide = value.toString();
+    });
+
+    tvocRef.limitToLast(1).on('value', querySnapshot => {
+      let data = querySnapshot.val();
+      let value = Object.values(data)
+      
+      console.log("total volatile organic compound: " + value);
+      this.totalVolatileOrganicCompound = value.toString();
+    });    
 
   },
   methods: {
@@ -204,6 +272,14 @@ export default {
     toggleHumidity(){
       console.log(this.showHumidity)
       this.showHumidity = !this.showHumidity;
+    },
+    toggleCarbonDioxide(){
+      console.log(this.showCarbonDioxide)
+      this.showCarbonDioxide = !this.showCarbonDioxide;
+    },
+    toggleTotalVolatileOrganicCompound() {
+      console.log(this.showTotalVolatileOrganicCompound)
+      this.showTotalVolatileOrganicCompound = !this.showTotalVolatileOrganicCompound;
     }
   }
 };
