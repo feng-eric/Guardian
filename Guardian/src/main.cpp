@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <Adafruit_VEML6070.h>
+//#include <Adafruit_VEML6070.h>
 #include <DHT.h>
 #include <DHT_U.h>
 #include <ESP8266WiFi.h>
@@ -8,7 +8,9 @@
 
 #include "Credentials.h"
 
-//#define TEST
+#define TEST
+//#define DHT_TEST
+//#define ULTRASONIC_TEST
 
 // DHT11 Variables
 #define DHT_PIN D2
@@ -16,12 +18,13 @@
 
 DHT dht(DHT_PIN, DHT_TYPE);
 
-// Ultrasonic Range Finder
-#define TRIG_PIN D4
-#define ECHO_PIN D3
 
-const int trig_pin = TRIG_PIN;
-const int echo_pin = ECHO_PIN;
+// Ultrasonic Range Finder
+//#define TRIG_PIN D4
+//#define ECHO_PIN D3
+
+const int trig_pin = 0;
+const int echo_pin = 2;
 
 long duration;
 long distance;
@@ -57,6 +60,7 @@ void ConnectToWiFi()
 void setup() 
 {
   Serial.begin(115200);
+
   // ESP8266
   ConnectToWiFi();
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
@@ -65,10 +69,10 @@ void setup()
   dht.begin();
   pinMode(D0, OUTPUT);
 
-  /*
+  
   // Ultrasonic Range Finder
   pinMode(trig_pin, OUTPUT);
-  pinMode(echo_pin, INPUT);*/
+  pinMode(echo_pin, INPUT);
 }
 
 void loop() 
@@ -100,7 +104,9 @@ void loop()
   Serial.print("[INFO] pushed: /dht11/humidity    \tkey: ");
   Serial.println(humValueID);
   Serial.println();
-#else
+
+#endif
+#ifdef DHT_TEST
 
   // DHT11 Temperature and Humidity Sensor
   float h = dht.readHumidity();
@@ -144,8 +150,8 @@ void loop()
   {
       Serial.println("[ERROR] Wrong values!");
   }
-
-  /*
+#endif
+#ifdef ULTRASONIC_TEST
   // Ultrasonic Range Finder 
 
   // clear the trigger pin
@@ -161,9 +167,9 @@ void loop()
   distance = duration * 0.034/2;
   Serial.print("[INFO] Distance = ");
   Serial.print(distance);
-  */
+  
   #endif
 
-  delay(5000);
+  delay(1000);
 
 }
