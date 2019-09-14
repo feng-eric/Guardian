@@ -157,9 +157,9 @@ export default {
       console.log("temp array after")
       this.temperatureData.push(value.toString())
       console.log(this.temperatureData)
-      // this.$refs.realtimeChart.updateSeries([{
-      //   data: this.temperatureData
-      // }])
+      this.$refs.realtimeChart.updateSeries([{
+        data: this.temperatureData
+      }])
       // getNewSeries(lastDate, {
       //   min: 20,
       //   max: 90
