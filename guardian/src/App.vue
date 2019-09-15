@@ -22,7 +22,7 @@
                       </div>   -->
                       <div class="card-body">
                           <h1 id="temperature" style="font-size: 75px;" class="card-title"> {{temperatureData[temperatureData.length-1].y}}°C</h1>
-                          <p class="card-text">Temperature expressed in Celsius degree.</p>
+                          <p class="card-text">Temperature displayed in Celsius degree.</p>
                       </div>
                     </div>
                     <div v-else>
@@ -44,7 +44,7 @@
                     <div v-if="showHumidity">
                       <div class="card-body">
                           <h1 id="humidity" style="font-size: 75px;" class="card-title"><span> {{humidityData[humidityData.length - 1].y}}%</span></h1>
-                          <p class="card-text">Relative humidity, expressed in percentage.</p>
+                          <p class="card-text">Relative humidity displayed in percentage.</p>
                       </div>
                     </div>
                     <div v-else>
@@ -60,7 +60,7 @@
                     <div v-if="showCarbonDioxide">
                       <div class="card-body">
                           <h1 id="carbonDioxide" style="font-size: 75px;" class="card-title"> {{carbonDioxideData[carbonDioxideData.length-1].y}}<span>ppb</span></h1>
-                          <p class="card-text">Number articles of carbon of dioxide in the air per billion.</p>
+                          <p class="card-text">Number articles of carbon of dioxide in the air in parts per billion.</p>
                       </div>
                     </div>
                     <div v-else>
@@ -83,8 +83,8 @@
                       :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
                     <div v-if="showTotalVolatileOrganicCompound">
                       <div class="card-body">
-                          <h1 id="totalVolatileOrganicCompound" style="font-size: 75px;" class="card-title"> {{totalVolatileOrganicCompoundData[totalVolatileOrganicCompoundData.length-1].y}}<span>ppm</span></h1>
-                          <p class="card-text">DESCRIPTION</p>
+                          <h1 id="totalVolatileOrganicCompound" style="font-size: 75px;" class="card-title"> {{totalVolatileOrganicCompoundData[totalVolatileOrganicCompoundData.length-1].y}}<span>ppb</span></h1>
+                          <p class="card-text">Total volatile organic compound in the air in parts per billion</p>
                       </div>
                     </div>
                     <div v-else>
@@ -103,7 +103,7 @@
                     <div v-if="showAltitude">
                       <div class="card-body">
                           <h1 id="altitude" style="font-size: 75px;" class="card-title"> {{altitudeData[altitudeData.length-1].y}}<span>metres</span></h1>
-                          <p class="card-text">DESCRIPTION</p>
+                          <p class="card-text">Altitude displayed in metres</p>
                       </div>
                     </div>
                     <div v-else>
@@ -119,7 +119,7 @@
                     <div v-if="showAtmosphericPressure">
                       <div class="card-body">
                           <h1 id="atmosphericPressure" style="font-size: 75px;" class="card-title"> {{atomospherePressureData[atomospherePressureData.length-1].y}}<span>hPa</span></h1>
-                          <p class="card-text">DESCRIPTION</p>
+                          <p class="card-text">Atmospheric pressure displayed in metres</p>
                       </div>
                     </div>
                     <div v-else>
