@@ -167,7 +167,8 @@ export default {
       options: {
         chart: {
           id: 'vuechart-example'
-        }
+        },
+        colors: ['#0078FF']
       },
       dangerOptions: {
         chart: {
@@ -222,7 +223,7 @@ export default {
       return {
         'bg-danger' : this.showTemperatureAlert,
         'bg-light': !this.showTemperatureAlert,
-        'whiteText' : this.showTemperatureAlert
+        'whiteText' : this.showTemperatureAlert,
       }
     },
 
@@ -230,21 +231,21 @@ export default {
        return {
         'bg-danger' : this.showHumidityAlert,
         'bg-light': !this.showHumidityAlert,
-        'whiteText' : this.showHumidityAlert
+        'whiteText' : this.showHumidityAlert,
       }
     },
     carbonDioxideClassObject: function(){
        return {
         'bg-danger' : this.showCarbonDioxideAlert,
         'bg-light': !this.showCarbonDioxideAlert,
-        'whiteText' : this.showCarbonDioxideAlert
+        'whiteText' : this.showCarbonDioxideAlert,
       }
     },
     totalVolatileOrganicCompoundClassObject: function(){
        return {
         'bg-danger' : this.showTotalVolatileOrganicCompoundAlert,
         'bg-light': !this.showTotalVolatileOrganicCompoundAlert,
-        'whiteText' : this.showTotalVolatileOrganicCompoundAlert
+        'whiteText' : this.showTotalVolatileOrganicCompoundAlert,
       }
     },
     temperatureOptions: function(){ 
