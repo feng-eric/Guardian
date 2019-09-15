@@ -7,10 +7,11 @@
         <b-button variant="primary" href="#">More Info</b-button> -->
       </b-jumbotron>
     </div>
-    <div class="row">
-            <div class="col-sm-6"> <!-- Temperature Column -->
-                <div class="card text-black bg-info mb-3" height=1000px style="max-width: 18rem;">
-                    <div style="font-size: 20px;" class="card-header">Temperature</div>
+    <div class="mt-5">
+      <div>
+        <b-card-group deck>
+          <b-card bg-variant="light" header="Temperature" class="text-center">
+    
                     <ToggleButton 
                       @change="toggleTemperature"
                       :width="toggleButtonWidth"
@@ -30,16 +31,13 @@
                       </div>   -->
                         <apexchart ref="temperatureChart" type=line :options="options" :series="tempSeries" />
                     </div>
-                </div>
-                <b-alert show v-model="showTemperatureAlert" variant="danger">
+              <b-alert show v-model="showTemperatureAlert" variant="danger">
                 WARNING: Critical Temperature
-                </b-alert>
-            </div>
-             
-            <div class="col-sm-6"> <!-- Humidity Column -->
-                <div class="card text-black bg-warning mb-3" style="max-width: 18rem;">
-                    <div style="font-size: 20px;" class="card-header">Humidity</div>
-                     <ToggleButton 
+              </b-alert>
+          </b-card>
+
+          <b-card bg-variant="light" header="Humidity" class="text-center">
+            <ToggleButton 
                       @change="toggleHumidity"
                       :width="toggleButtonWidth"
                       :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
@@ -52,16 +50,10 @@
                     <div v-else>
                       <apexchart ref="humidityChart" type="line" :options="options" :series="series"></apexchart>
                     </div>
-                </div>
-                <b-alert show v-model="showHumidityAlert" variant="danger">
-                WARNING: Critical Humidity
-                </b-alert>
-            </div>
-
-            <div class="col-sm-6"> <!-- Carbon Dioxide Column -->
-                <div class="card text-black bg-success mb-3" style="max-width: 18rem;">
-                    <div style="font-size: 20px;" class="card-header">Carbon Dioxide</div>
-                     <ToggleButton 
+              
+          </b-card>
+          <b-card bg-variant="light" header="Carbon Dioxide" class="text-center">
+              <ToggleButton 
                       @change="toggleCarbonDioxide"
                       :width="toggleButtonWidth"
                       :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
@@ -74,15 +66,18 @@
                     <div v-else>
                       <apexchart ref="carbonDioxideChart" type=line :options="options" :series="carbonDioxideSeries" />
                     </div>
-                </div>
-                <b-alert show v-model="showCarbonDioxideAlert" variant="danger">
+              <b-alert show v-model="showCarbonDioxideAlert" variant="danger">
                 WARNING: Critical Carbon Dioxide Levels
-                </b-alert>
-            </div>
-             <div class="col-sm-6"> <!-- Total Volatile Column -->
-                <div class="card text-black bg-light mb-3" style="max-width: 18rem;">
-                    <div style="font-size: 20px;" class="card-header">Total Volatile Organic Compound</div>
-                     <ToggleButton 
+              </b-alert>
+          </b-card>
+        </b-card-group>
+
+      </div>
+    </div>
+    <div class="mt-5">
+      <b-card-group deck>
+        <b-card bg-variant="light" header="Total Volatile Organic Compound" class="text-center">
+            <ToggleButton 
                       @change="toggleTotalVolatileOrganicCompound"
                       :width="toggleButtonWidth"
                       :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
@@ -95,15 +90,13 @@
                     <div v-else>
                       <apexchart ref="totalVolatileOrganicChart" type=line :options="options" :series="totalVolatileOrganicCompoundSeries" />
                     </div>
-                </div>
-                <b-alert show v-model="showTotalVolatileOrganicCompoundAlert" variant="danger">
+                    <b-alert show v-model="showTotalVolatileOrganicCompoundAlert" variant="danger">
                 WARNING: High Total Volatile Organic Compound Levels
                 </b-alert>
-            </div>
-            <div class="col-sm-6"> <!-- Total Altitude Column -->
-                <div class="card text-black bg-light mb-3" style="max-width: 18rem;">
-                    <div style="font-size: 20px;" class="card-header">Altitude</div>
-                     <ToggleButton 
+        </b-card>
+
+        <b-card bg-variant="light" header="Altitude" class="text-center">
+            <ToggleButton 
                       @change="toggleAltitude"
                       :width="toggleButtonWidth"
                       :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
@@ -116,12 +109,10 @@
                     <div v-else>
                       <apexchart ref="altitudeChart" type=line :options="options" :series="altitudeSeries" />
                     </div>
-                </div>
-            </div>
-            <div class="col-sm-6"> <!-- Total Atmospheric Pressure Column -->
-                <div class="card text-black bg-light mb-3" style="max-width: 18rem;">
-                    <div style="font-size: 20px;" class="card-header">Atmospheric Pressure</div>
-                     <ToggleButton 
+        </b-card>
+
+        <b-card bg-variant="light" header="Atomspheric Pressure" class="text-center">
+          <ToggleButton 
                       @change="toggleAtmosphericPressure"
                       :width="toggleButtonWidth"
                       :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
@@ -134,9 +125,9 @@
                     <div v-else>
                       <apexchart ref="atmosphericPressureChart" type=line :options="options" :series="atmosphericPressureSeries" />
                     </div>
-                </div>
-            </div>
-    </div>
+        </b-card>
+      </b-card-group>
+    </div>         
   </div>
 </template>
 
@@ -211,8 +202,8 @@ export default {
     const humRef = database.ref('DHT11').child('humidity')
     const coRef = database.ref('CCS811').child('CO2')
     const tvocRef = database.ref('CCS811').child('TVOC')
-    const atomospherePressureRef = database.ref('BME280').child('Altitude')
-    const altitudeRef = database.ref('BME280').child('Pressure')
+    const atomospherePressureRef = database.ref('BME280').child('Pressure')
+    const altitudeRef = database.ref('BME280').child('Altitude')
 
     // tempRef.remove();
     // humRef.remove();
