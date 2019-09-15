@@ -8,8 +8,8 @@
       </b-jumbotron>
     </div>
     <div class="row">
-            <div class="col-sm-4"> <!-- Temperature Column -->
-              <div class="card text-white mb-3" v-bind:class="classObject" height=1000px style="max-width: 18rem;">
+            <div class="col-sm-6"> <!-- Temperature Column -->
+              <div class="card text-white mb-3" v-bind:class="temperatureClassObject" height=1000px style="max-width: 18rem;">
                     <div style="font-size: 20px;" class="card-header">Temperature</div>
                     <ToggleButton 
                       @change="toggleTemperature"
@@ -31,13 +31,13 @@
                         <apexchart ref="temperatureChart" type=line :options="options" :series="tempSeries" />
                     </div>
                 </div>
+                <b-alert show v-model="showTemperatureAlert" variant="danger">
+                WARNING: Critical Temperature
+                </b-alert>
             </div>
-             <b-alert v-model="showDismissibleAlert" variant="danger">
-                High Temperature
-             </b-alert>
              
-            <div class="col-sm-4"> <!-- Humidity Column -->
-                <div class="card text-white mb-3" v-bind:class="{ 'bg-primary': true}" style="max-width: 18rem;">
+            <div class="col-sm-6"> <!-- Humidity Column -->
+                <div class="card text-white mb-3" v-bind:class="humidityClassObject" style="max-width: 18rem;">
                     <div style="font-size: 20px;" class="card-header">Humidity</div>
                      <ToggleButton 
                       @change="toggleHumidity"
@@ -53,10 +53,13 @@
                       <apexchart ref="humidityChart" type="line" :options="options" :series="series"></apexchart>
                     </div>
                 </div>
+                <b-alert show v-model="showHumidityAlert" variant="danger">
+                WARNING: Critical Humidity
+                </b-alert>
             </div>
 
-            <div class="col-sm-4"> <!-- Carbon Dioxide Column -->
-                <div class="card text-black bg-light mb-3" style="max-width: 18rem;">
+            <div class="col-sm-6"> <!-- Carbon Dioxide Column -->
+                <div class="card text-black mb-3" v-bind:class="carbonDioxideClassObject" style="max-width: 18rem;">
                     <div style="font-size: 20px;" class="card-header">Carbon Dioxide</div>
                      <ToggleButton 
                       @change="toggleCarbonDioxide"
@@ -64,7 +67,7 @@
                       :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
                     <div v-if="showCarbonDioxide">
                       <div class="card-body">
-                          <h1 id="carbonDioxide" style="font-size: 75px;" class="card-title"> {{carbonDioxideData[carbonDioxideData.length-1].y}}<span>%</span></h1>
+                          <h1 id="carbonDioxide" style="font-size: 75px;" class="card-title"> {{carbonDioxideData[carbonDioxideData.length-1].y}}<span>ppm</span></h1>
                           <p class="card-text">DESCRIPTION</p>
                       </div>
                     </div>
@@ -72,9 +75,12 @@
                       <apexchart ref="carbonDioxideChart" type=line :options="options" :series="carbonDioxideSeries" />
                     </div>
                 </div>
+                <b-alert show v-model="showCarbonDioxideAlert" variant="danger">
+                WARNING: Critical Carbon Dioxide Levels
+                </b-alert>
             </div>
-             <div class="col-sm-4"> <!-- Total Volatile Column -->
-                <div class="card text-black bg-success mb-3" style="max-width: 18rem;">
+             <div class="col-sm-6"> <!-- Total Volatile Column -->
+                <div class="card text-black mb-3"  v-bind:class="TotalVolatileOrganicCompoundClassObject" style="max-width: 18rem;">
                     <div style="font-size: 20px;" class="card-header">Total Volatile Organic Compound</div>
                      <ToggleButton 
                       @change="toggleTotalVolatileOrganicCompound"
@@ -82,12 +88,51 @@
                       :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
                     <div v-if="showTotalVolatileOrganicCompound">
                       <div class="card-body">
-                          <h1 id="totalVolatileOrganicCompound" style="font-size: 75px;" class="card-title"> {{totalVolatileOrganicCompoundData[totalVolatileOrganicCompoundData.length-1].y}}<span>%</span></h1>
+                          <h1 id="totalVolatileOrganicCompound" style="font-size: 75px;" class="card-title"> {{totalVolatileOrganicCompoundData[totalVolatileOrganicCompoundData.length-1].y}}<span>ppm</span></h1>
                           <p class="card-text">DESCRIPTION</p>
                       </div>
                     </div>
                     <div v-else>
                       <apexchart ref="totalVolatileOrganicChart" type=line :options="options" :series="totalVolatileOrganicCompoundSeries" />
+                    </div>
+                </div>
+                <b-alert show v-model="showTotalVolatileOrganicCompoundAlert" variant="danger">
+                WARNING: High Total Volatile Organic Compound Levels
+                </b-alert>
+            </div>
+            <div class="col-sm-6"> <!-- Total Altitude Column -->
+                <div class="card text-black bg-light mb-3" style="max-width: 18rem;">
+                    <div style="font-size: 20px;" class="card-header">Altitude</div>
+                     <ToggleButton 
+                      @change="toggleAltitude"
+                      :width="toggleButtonWidth"
+                      :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
+                    <div v-if="showAltitude">
+                      <div class="card-body">
+                          <h1 id="altitude" style="font-size: 75px;" class="card-title"> {{altitudeData[altitudeData.length-1].y}}<span>metres</span></h1>
+                          <p class="card-text">DESCRIPTION</p>
+                      </div>
+                    </div>
+                    <div v-else>
+                      <apexchart ref="altitudeChart" type=line :options="options" :series="altitudeSeries" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6"> <!-- Total Atmospheric Pressure Column -->
+                <div class="card text-black bg-light mb-3" style="max-width: 18rem;">
+                    <div style="font-size: 20px;" class="card-header">Atmospheric Pressure</div>
+                     <ToggleButton 
+                      @change="toggleAtmosphericPressure"
+                      :width="toggleButtonWidth"
+                      :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
+                    <div v-if="showAtmosphericPressure">
+                      <div class="card-body">
+                          <h1 id="atmosphericPressure" style="font-size: 75px;" class="card-title"> {{atomospherePressureData[atomospherePressureData.length-1].y}}<span>hPa</span></h1>
+                          <p class="card-text">DESCRIPTION</p>
+                      </div>
+                    </div>
+                    <div v-else>
+                      <apexchart ref="atmosphericPressureChart" type=line :options="options" :series="atmosphericPressureSeries" />
                     </div>
                 </div>
             </div>
@@ -103,32 +148,38 @@ import {database} from './main'
 export default {
   name: 'app',
   components: {
-    HelloWorld,
-    // 'apexchart': ApexCharts
+    HelloWorld
   },
   data() {
     return {
       humidity: 20,
-      safeTemperature: true,
+      unsafeTemperature: true,
       temperatureData: [],
       humidityData: [],
       carbonDioxideData: [],
       totalVolatileOrganicCompoundData: [],
+      altitudeData: [],
+      atomospherePressureData: [],
       showTemperature: true,
       showHumidity: true,
       showCarbonDioxide: true,
       showTotalVolatileOrganicCompound: true,
+      showAltitude: true,
+      showAtmosphericPressure: true,
       temperature: '',
       humidity: '',
       carbonDioxide: '',
       totalVolatileOrganicCompound: '',
+      altitude: '',
+      atmosphericpressure: '',
       toggleButtonWidth: 100,
       options: {
         chart: {
           id: 'vuechart-example'
         },
         xaxis: {
-        }
+        },
+        colors: ['#292121']
       },
       tempSeries: [{
         name: 'series-1',
@@ -142,16 +193,52 @@ export default {
         name: 'series-4',
         data: [0]
       }],
-      showDismissibleAlert: false
+      altitudeSeries: [{
+        name: 'series-5',
+        data: [0]
+      }],
+      atmosphericPressureSeries: [{
+        name: 'series-5',
+        data: [0]
+      }],
+      showTemperatureAlert: false,
+      showHumidityAlert: false,
+      showCarbonDioxideAlert: false,
+      showTotalVolatileOrganicCompoundAlert: false
     }
   },
   computed: {
-    classObject: function(){
+    temperatureClassObject: function(){
       return {
-        'bg-warning': this.safeTemperature, 
-        'bg-danger': !this.safeTemperature
+        'bg-info': !this.showTemperatureAlert, 
+        'bg-danger': this.showTemperatureAlert
+      }
+    },
+    humidityClassObject: function(){
+      return {
+        'bg-warning': !this.showHumidityAlert, 
+        'bg-danger': this.showHumidityAlert
+      }
+    },
+    carbonDioxideClassObject: function(){
+      return {
+        'bg-success': !this.showCarbonDioxideAlert, 
+        'bg-danger': this.showCarbonDioxideAlert
+      }
+    },
+    TotalVolatileOrganicCompoundClassObject: function(){
+      return {
+        'bg-light': !this.showTotalVolatileOrganicCompoundAlert, 
+        'bg-danger': this.showTotalVolatileOrganicCompoundAlert
+      }
+    },
+    altitudeClassObject: function(){
+      return {
+        'bg-info': !this.showAltitudeAlert, 
+        'bg-danger': this.showAltitudeAlert
       }
     }
+
   },
   watch: {
     
@@ -161,14 +248,25 @@ export default {
     const humRef = database.ref('DHT11').child('humidity')
     const coRef = database.ref('CCS811').child('CO2')
     const tvocRef = database.ref('CCS811').child('TVOC')
-    //tempRef.remove();
-    //humRef.remove();
+    const atomospherePressureRef = database.ref('BME280').child('Altitude')
+    const altitudeRef = database.ref('BME280').child('Pressure')
+
+    // tempRef.remove();
+    // humRef.remove();
+    // coRef.remove()
+    // tvocRef.remove()
+    // atomospherePressureRef.remove()
+    // altitudeRef.remove()
 
     tempRef.limitToLast(1).on('value', querySnapshot => {
       let data = querySnapshot.val();
       let value = Object.values(data)
     
-      console.log(this.safeTemperature)
+      if (value >= 24.8 ) {
+        this.showTemperatureAlert = true;
+      } else {
+        this.showTemperatureAlert = false;
+      }
       var date = new Date()
       var hours = date.getHours()
       var minutes = date.getMinutes()
@@ -181,13 +279,6 @@ export default {
       if (this.temperatureData.length > 8) {
         this.temperatureData = this.temperatureData.slice(this.temperatureData.length - 8, this.temperatureData.length)
       }
-       if (this.temperatureData[this.temperatureData.length - 1].y >= 24.8 ) {
-        this.safeTemperature = false;
-        this.showDismissibleAlert = true;
-      } else {
-        this.safeTemperature = true;
-        this.showDismissibleAlert = false;
-      }
       this.$refs.temperatureChart.updateSeries([{
         data: this.temperatureData
       }])
@@ -196,7 +287,12 @@ export default {
     humRef.limitToLast(1).on('value', querySnapshot => {
       let data = querySnapshot.val();
       let value = Object.values(data)
-      
+
+      if (value.toString() > 50) {
+        this.showHumidityAlert = true;
+      } else {
+        this.showHumidityAlert = false;
+      }
       
       var date = new Date()
       var hours = date.getHours()
@@ -222,6 +318,13 @@ export default {
     coRef.limitToLast(1).on('value', querySnapshot => {
       let data = querySnapshot.val();
       let value = Object.values(data)
+
+      if (value.toString() > 1000) {
+        this.showCarbonDioxideAlert = true;
+      } else {
+        this.showCarbonDioxideAlert = false;
+      }
+
       var date = new Date()
       var hours = date.getHours()
       var minutes = date.getMinutes()
@@ -242,6 +345,13 @@ export default {
     tvocRef.limitToLast(1).on('value', querySnapshot => {
       let data = querySnapshot.val();
       let value = Object.values(data)
+
+      if (value.toString() > 200) {
+        this.showTotalVolatileOrganicCompoundAlert = true;
+      } else {
+        this.showTotalVolatileOrganicCompoundAlert = false;
+      }
+
       var date = new Date()
       var hours = date.getHours()
       var minutes = date.getMinutes()
@@ -258,6 +368,48 @@ export default {
         data: this.totalVolatileOrganicCompoundData
       }])
     });    
+
+    altitudeRef.limitToLast(1).on('value', querySnapshot => {
+      let data = querySnapshot.val();
+      let value = Object.values(data)
+
+      var date = new Date()
+      var hours = date.getHours()
+      var minutes = date.getMinutes()
+      var seconds = date.getSeconds()
+      if (seconds < 10) {
+        seconds = "0" + seconds.toString()
+      }
+      var time = hours + ":" + minutes + ":" + seconds
+      this.altitudeData.push({ x : time, y : value.toString()})
+      if (this.altitudeData.length > 8) {
+        this.altitudeData = this.altitudeData.slice(this.altitudeData.length - 8, this.altitudeData.length)
+      }
+      this.$refs.altitudeChart.updateSeries([{
+        data: this.altitudeData
+      }])
+    }); 
+
+    atomospherePressureRef.limitToLast(1).on('value', querySnapshot => {
+      let data = querySnapshot.val();
+      let value = Object.values(data)
+
+      var date = new Date()
+      var hours = date.getHours()
+      var minutes = date.getMinutes()
+      var seconds = date.getSeconds()
+      if (seconds < 10) {
+        seconds = "0" + seconds.toString()
+      }
+      var time = hours + ":" + minutes + ":" + seconds
+      this.atomospherePressureData.push({ x : time, y : value.toString()})
+      if (this.atomospherePressureData.length > 8) {
+        this.atomospherePressureData = this.atomospherePressureData.slice(this.atomospherePressureData.length - 8, this.atomospherePressureData.length)
+      }
+      this.$refs.atmosphericPressureChart.updateSeries([{
+        data: this.atomospherePressureData
+      }])
+    }); 
 
   },
   methods: {
@@ -276,6 +428,14 @@ export default {
     toggleTotalVolatileOrganicCompound() {
       console.log(this.showTotalVolatileOrganicCompound)
       this.showTotalVolatileOrganicCompound = !this.showTotalVolatileOrganicCompound;
+    },
+    toggleAltitude() {
+      console.log(this.showAltitude)
+      this.showAltitude = !this.showAltitude
+    },
+    toggleAtmosphericPressure() {
+      console.log(this.showAtmosphericPressure)
+      this.showAtmosphericPressure = !this.showAtmosphericPressure
     }
   }
 };
