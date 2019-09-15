@@ -17,28 +17,17 @@
 #include "Credentials.h"
 
 //#define TEST
-//#define DHT_TEST
+#define DHT_TEST
 //#define ULTRASONIC_TEST
-//#define CCS811_TEST
+#define CCS811_TEST
 #define BME280_TEST
 #define VEML6070_TEST
-
-// GOOGLE MAPS API
-WifiLocation location(GOOGLE_API_KEY);
 
 // DHT11
 #define DHT_PIN D3
 #define DHT_TYPE DHT11
 
 DHT dht(DHT_PIN, DHT_TYPE);
-
-
-// Ultrasonic Range Finder
-//#define TRIG_PIN D4
-//#define ECHO_PIN D3
-
-//const int trig_pin = 0;
-//const int echo_pin = 2;
 
 long duration;
 long distance;
@@ -92,31 +81,15 @@ void setup()
   ConnectToWiFi();
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
 
-  // GOOGLE MAPS API
-  //WiFi.mode(WIFI_STA);
-  /*location_t loc = location.getGeoFromWiFi();
-  Serial.println("Location request data");
-  Serial.println(location.getSurroundingWiFiJson());
-  Serial.println("Latitude: " + String(loc.lat, 7));
-  Serial.println("Longitude: " + String(loc.lon, 7));
-  Serial.println("Accuracy: " + String(loc.accuracy));*/
-
   // DHT
   dht.begin();
   pinMode(D0, OUTPUT);
-
-  
-  // Ultrasonic Range Finder
-  //pinMode(trig_pin, OUTPUT);
-  //pinMode(echo_pin, INPUT);
 
   //CCS811
   ccs811.begin();
 
   // BME280
   while(!Serial);    // time to get serial running
-    Serial.println(F("BME280 test"));
-
     unsigned status;
   
     // default settings
@@ -131,8 +104,6 @@ void setup()
         Serial.print("        ID of 0x61 represents a BME 680.\n");
         while (1);
     }
-    
-    Serial.println("-- Default Test --");
     delayTime = 1000;
     Serial.println();
 
@@ -298,7 +269,7 @@ void loop()
   Serial.print("[INFO] pushed: /BME280/Pressure \tkey: ");
   Serial.println(PressureValueID);
 
-  // Push TVOC reading to Firebase
+  // Push Altitude reading to Firebase
   String AltitudeValueID = Firebase.pushFloat("BME280/Altitude", tempAltitude);
   if (Firebase.failed()) 
   {
@@ -327,6 +298,6 @@ void loop()
   Serial.println(UVValueID);
 #endif
 
-  delay(2000);
+  delay(500);
 
 }
