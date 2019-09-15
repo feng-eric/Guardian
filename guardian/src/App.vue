@@ -10,7 +10,7 @@
     <div class="mt-5">
       <div>
         <b-card-group deck>
-          <b-card bg-variant="light" header="Temperature" class="text-center">
+          <b-card :bg-variant="temperatureClassObject" header="Temperature" class="text-center">
     
                     <ToggleButton 
                       @change="toggleTemperature"
@@ -29,14 +29,14 @@
                       <!-- <div @click=toggleTemperature>
                         Click to see current data
                       </div>   -->
-                        <apexchart ref="temperatureChart" type=line :options="options" :series="tempSeries" />
+                        <apexchart ref="temperatureChart" type=line :options="temperatureOptions" :series="tempSeries" />
                     </div>
               <b-alert show v-model="showTemperatureAlert" variant="danger">
                 WARNING: Critical Temperature
               </b-alert>
           </b-card>
 
-          <b-card bg-variant="light" header="Humidity" class="text-center">
+          <b-card :bg-variant="humidityClassObject" header="Humidity" class="text-center">
             <ToggleButton 
                       @change="toggleHumidity"
                       :width="toggleButtonWidth"
@@ -52,14 +52,14 @@
                     </div>
               
           </b-card>
-          <b-card bg-variant="light" header="Carbon Dioxide" class="text-center">
+          <b-card :bg-variant="carbonDioxideClassObject" header="Carbon Dioxide" class="text-center">
               <ToggleButton 
                       @change="toggleCarbonDioxide"
                       :width="toggleButtonWidth"
                       :labels="{checked: 'Chart', unchecked: 'Current Data'}"/>
                     <div v-if="showCarbonDioxide">
                       <div class="card-body">
-                          <h1 id="carbonDioxide" style="font-size: 75px;" class="card-title"> {{carbonDioxideData[carbonDioxideData.length-1].y}}<span>ppm</span></h1>
+                          <h1 id="carbonDioxide" style="font-size: 75px;" class="card-title"> {{carbonDioxideData[carbonDioxideData.length-1].y}}<span>ppb</span></h1>
                           <p class="card-text">DESCRIPTION</p>
                       </div>
                     </div>
@@ -76,7 +76,7 @@
     </div>
     <div class="mt-5">
       <b-card-group deck>
-        <b-card bg-variant="light" header="Total Volatile Organic Compound" class="text-center">
+        <b-card :bg-variant="TotalVolatileOrganicCompoundClassObject" header="Total Volatile Organic Compound" class="text-center">
             <ToggleButton 
                       @change="toggleTotalVolatileOrganicCompound"
                       :width="toggleButtonWidth"
@@ -143,6 +143,8 @@ export default {
   },
   data() {
     return {
+      humidity: 20,
+      unsafeTemperature: true,
       temperatureData: [],
       humidityData: [],
       carbonDioxideData: [],
@@ -167,8 +169,15 @@ export default {
           id: 'vuechart-example'
         },
         xaxis: {
+        }
+      },
+      dangerOptions: {
+        chart: {
+          id: 'vuechart-example'
         },
-        colors: ['#292121']
+        xaxis: {
+        },
+        colors: ['#FFFFFF']
       },
       tempSeries: [{
         name: 'series-1',
@@ -196,7 +205,27 @@ export default {
       showTotalVolatileOrganicCompoundAlert: false
     }
   },
+  computed: {
+    temperatureClassObject: function(){
+      return this.showTemperatureAlert ? "danger" : "light"
+    },
+    humidityClassObject: function(){
+      return this.showHumidityAlert ? "danger" : "light"
+    },
+    carbonDioxideClassObject: function(){
+      return this.showCarbonDioxideAlert ? "danger" : "light"
+    },
+    totalVolatileOrganicCompoundClassObject: function(){
+      return this.showTotalVolatileOrganicCompoundClassObject ? "danger" : "light"
+    },
+    temperatureOptions: function(){ 
+      return this.showTemperatureAlert ? this.dangerOptions : this.options
+    }
 
+  },
+  watch: {
+    
+  },
   created() {
     const tempRef = database.ref('DHT11').child('temperature')
     const humRef = database.ref('DHT11').child('humidity')
@@ -216,23 +245,14 @@ export default {
       let data = querySnapshot.val();
       let value = Object.values(data)
     
-      if (value.toString() > 40) {
+      if (value >= 20) {
         this.showTemperatureAlert = true;
       } else {
         this.showTemperatureAlert = false;
       }
-      var date = new Date()
-      var hours = date.getHours()
-      var minutes = date.getMinutes()
-      var seconds = date.getSeconds()
-      if (seconds < 10) {
-        seconds = "0" + seconds.toString()
-      }
-      var time = hours + ":" + minutes + ":" + seconds
-      this.temperatureData.push({ x : time, y : value.toString()})
-      if (this.temperatureData.length > 8) {
-        this.temperatureData = this.temperatureData.slice(this.temperatureData.length - 8, this.temperatureData.length)
-      }
+     
+      this.displayRecentData(this.temperatureData, value.toString())
+      
       this.$refs.temperatureChart.updateSeries([{
         data: this.temperatureData
       }])
@@ -248,25 +268,12 @@ export default {
         this.showHumidityAlert = false;
       }
       
-      var date = new Date()
-      var hours = date.getHours()
-      var minutes = date.getMinutes()
-      var seconds = date.getSeconds()
-      if (seconds < 10) {
-        seconds = "0" + seconds.toString()
-      }
-      var time = hours + ":" + minutes + ":" + seconds
-      this.humidityData.push({ x : time, y : value.toString()})
-      if (this.humidityData.length > 8) {
-        this.humidityData = this.humidityData.slice(this.humidityData.length - 8, this.humidityData.length)
-      }
+      this.displayRecentData(this.humidityData, value.toString())
+      
       this.$refs.humidityChart.updateSeries([{
         data: this.humidityData
       }])
 
-
-      console.log("humidity: " + value);
-     // this.humidity = value.toString();
     });
 
     coRef.limitToLast(1).on('value', querySnapshot => {
@@ -276,21 +283,11 @@ export default {
       if (value.toString() > 1000) {
         this.showCarbonDioxideAlert = true;
       } else {
-        this.showCarbonDioxideAlert = true;
+        this.showCarbonDioxideAlert = false;
       }
 
-      var date = new Date()
-      var hours = date.getHours()
-      var minutes = date.getMinutes()
-      var seconds = date.getSeconds()
-      if (seconds < 10) {
-        seconds = "0" + seconds.toString()
-      }
-      var time = hours + ":" + minutes + ":" + seconds
-      this.carbonDioxideData.push({ x : time, y : value.toString()})
-      if (this.carbonDioxideData.length > 8) {
-        this.carbonDioxideData = this.carbonDioxideData.slice(this.carbonDioxideData.length - 8, this.carbonDioxideData.length)
-      }
+      this.displayRecentData(this.carbonDioxideData, value.toString())
+
       this.$refs.carbonDioxideChart.updateSeries([{
         data: this.carbonDioxideData
       }])
@@ -306,18 +303,8 @@ export default {
         this.showTotalVolatileOrganicCompoundAlert = false;
       }
 
-      var date = new Date()
-      var hours = date.getHours()
-      var minutes = date.getMinutes()
-      var seconds = date.getSeconds()
-      if (seconds < 10) {
-        seconds = "0" + seconds.toString()
-      }
-      var time = hours + ":" + minutes + ":" + seconds
-      this.totalVolatileOrganicCompoundData.push({ x : time, y : value.toString()})
-      if (this.totalVolatileOrganicCompoundData.length > 8) {
-        this.totalVolatileOrganicCompoundData = this.totalVolatileOrganicCompoundData.slice(this.totalVolatileOrganicCompoundData.length - 8, this.totalVolatileOrganicCompoundData.length)
-      }
+      this.displayRecentData(this.totalVolatileOrganicCompoundData, value.toString())
+      
       this.$refs.totalVolatileOrganicChart.updateSeries([{
         data: this.totalVolatileOrganicCompoundData
       }])
@@ -327,18 +314,8 @@ export default {
       let data = querySnapshot.val();
       let value = Object.values(data)
 
-      var date = new Date()
-      var hours = date.getHours()
-      var minutes = date.getMinutes()
-      var seconds = date.getSeconds()
-      if (seconds < 10) {
-        seconds = "0" + seconds.toString()
-      }
-      var time = hours + ":" + minutes + ":" + seconds
-      this.altitudeData.push({ x : time, y : value.toString()})
-      if (this.altitudeData.length > 8) {
-        this.altitudeData = this.altitudeData.slice(this.altitudeData.length - 8, this.altitudeData.length)
-      }
+      this.displayRecentData(this.altitudeData, value.toString())
+      
       this.$refs.altitudeChart.updateSeries([{
         data: this.altitudeData
       }])
@@ -348,18 +325,8 @@ export default {
       let data = querySnapshot.val();
       let value = Object.values(data)
 
-      var date = new Date()
-      var hours = date.getHours()
-      var minutes = date.getMinutes()
-      var seconds = date.getSeconds()
-      if (seconds < 10) {
-        seconds = "0" + seconds.toString()
-      }
-      var time = hours + ":" + minutes + ":" + seconds
-      this.atomospherePressureData.push({ x : time, y : value.toString()})
-      if (this.atomospherePressureData.length > 8) {
-        this.atomospherePressureData = this.atomospherePressureData.slice(this.atomospherePressureData.length - 8, this.atomospherePressureData.length)
-      }
+      this.displayRecentData(this.atomospherePressureData, value.toString())
+
       this.$refs.atmosphericPressureChart.updateSeries([{
         data: this.atomospherePressureData
       }])
@@ -390,6 +357,31 @@ export default {
     toggleAtmosphericPressure() {
       console.log(this.showAtmosphericPressure)
       this.showAtmosphericPressure = !this.showAtmosphericPressure
+    },
+    setTime() {
+      var date = new Date()
+      var hours = date.getHours()
+      var minutes = date.getMinutes()
+      var seconds = date.getSeconds()
+      if (seconds < 10) {
+        seconds = "0" + seconds.toString()
+      }
+      
+      if (minutes < 10) {
+        minutes = "0" + minutes.toString()
+      }
+
+      if (hours < 10) {
+        hours = "0" +  minutes.toString()
+      }
+
+      return hours + ":" + minutes + ":" + seconds
+    },
+    displayRecentData(sensorData, dataPoint) {
+      sensorData.push({ x : this.setTime(), y : dataPoint})
+      if (sensorData.length > 8) {
+        sensorData = sensorData.slice(sensorData.length - 8, sensorData.length)
+      }
     }
   }
 };
@@ -415,5 +407,8 @@ background-size: cover;
  b-jumbotron {
   width: 50%;
   }
-
+  .card {
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
+  }
 </style>
