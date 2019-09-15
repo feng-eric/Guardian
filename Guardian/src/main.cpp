@@ -1,22 +1,32 @@
 #include <Arduino.h>
+#include <Adafruit_BME280.h>
 #include <Adafruit_CCS811.h>
+#include <Adafruit_Sensor.h>
 #include <Adafruit_VEML6070.h>
 #include <DHT.h>
 #include <DHT_U.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <FirebaseArduino.h>
+#include <SparkFunBME280.h>
 #include <SparkFunCCS811.h>
+#include <SPI.h>
+#include <WifiLocation.h>
 #include <Wire.h>
 
 #include "Credentials.h"
 
 //#define TEST
-#define DHT_TEST
+//#define DHT_TEST
 //#define ULTRASONIC_TEST
-#define CCS811_TEST
+//#define CCS811_TEST
+#define BME280_TEST
+#define VEML6070_TEST
 
-// DHT11 Variables
+// GOOGLE MAPS API
+WifiLocation location(GOOGLE_API_KEY);
+
+// DHT11
 #define DHT_PIN D3
 #define DHT_TYPE DHT11
 
@@ -33,8 +43,17 @@ DHT dht(DHT_PIN, DHT_TYPE);
 long duration;
 long distance;
 
+// CSS811 CO2 and TVOC
 #define CSS811_ADDR 0x5B
 CCS811 ccs811(CSS811_ADDR);
+
+// BME280 Pressue Sensor
+#define SEALEVELPRESSURE_HPA 1013.25
+Adafruit_BME280 bme;
+unsigned long delayTime;
+
+// VEML6070
+Adafruit_VEML6070 uv = Adafruit_VEML6070();
 
 void ConnectToWiFi()
 {
@@ -73,7 +92,16 @@ void setup()
   ConnectToWiFi();
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
 
-  //DHT
+  // GOOGLE MAPS API
+  //WiFi.mode(WIFI_STA);
+  /*location_t loc = location.getGeoFromWiFi();
+  Serial.println("Location request data");
+  Serial.println(location.getSurroundingWiFiJson());
+  Serial.println("Latitude: " + String(loc.lat, 7));
+  Serial.println("Longitude: " + String(loc.lon, 7));
+  Serial.println("Accuracy: " + String(loc.accuracy));*/
+
+  // DHT
   dht.begin();
   pinMode(D0, OUTPUT);
 
@@ -84,6 +112,32 @@ void setup()
 
   //CCS811
   ccs811.begin();
+
+  // BME280
+  while(!Serial);    // time to get serial running
+    Serial.println(F("BME280 test"));
+
+    unsigned status;
+  
+    // default settings
+    // (you can also pass in a Wire library object like &Wire2)
+    status = bme.begin();  
+    if (!status) {
+        Serial.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
+        Serial.print("SensorID was: 0x"); Serial.println(bme.sensorID(),16);
+        Serial.print("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n");
+        Serial.print("   ID of 0x56-0x58 represents a BMP 280,\n");
+        Serial.print("        ID of 0x60 represents a BME 280.\n");
+        Serial.print("        ID of 0x61 represents a BME 680.\n");
+        while (1);
+    }
+    
+    Serial.println("-- Default Test --");
+    delayTime = 1000;
+    Serial.println();
+
+    // VEML6070
+    uv.begin(VEML6070_1_T);
 }
 
 void loop() 
@@ -220,9 +274,59 @@ void loop()
   {
     Serial.print("[ERROR] Cannot print values");
     Serial.println();
-    //while(1);
   }
 #endif
-  delay(1000);
+#ifdef BME280_TEST
+  Serial.print("[INFO] Pressure: ");
+  float tempPressure = bme.readPressure() / 100.0F;
+	Serial.print(tempPressure);
+	Serial.println("hPa");
+
+	Serial.print("[INFO] Approx. Altitude: ");
+  float tempAltitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
+	Serial.print(tempAltitude);
+	Serial.println("m");
+
+  // Push pressure reading to Firebase
+  String PressureValueID = Firebase.pushFloat("BME280/Pressure", tempPressure);
+  if (Firebase.failed()) 
+  {
+      Serial.print("[ERROR] pushing /BME280/Pressure failed:");
+      Serial.println(Firebase.error());
+      return;
+  }
+  Serial.print("[INFO] pushed: /BME280/Pressure \tkey: ");
+  Serial.println(PressureValueID);
+
+  // Push TVOC reading to Firebase
+  String AltitudeValueID = Firebase.pushFloat("BME280/Altitude", tempAltitude);
+  if (Firebase.failed()) 
+  {
+      Serial.print("[ERROR] pushing /BME280/Altitude failed:");
+      Serial.println(Firebase.error());
+      return;
+  }
+  Serial.print("[INFO] pushed: /BME280/Altitude \tkey: ");
+  Serial.println(AltitudeValueID);
+#endif
+#ifdef VEML6070_TEST
+  Serial.print("[INFO] UV light level: ");
+  int UV = uv.readUV();
+  Serial.print(UV);
+
+  // Push UV index reading to Firebase
+  String UVValueID = Firebase.pushFloat("VEML6070/UV", UV);
+  if (Firebase.failed()) 
+  {
+      Serial.print("[ERROR] pushing /VEML6070/UV failed:");
+      Serial.println(Firebase.error());
+      return;
+  }
+  Serial.println();
+  Serial.print("[INFO] pushed: /VEML6070/UV \tkey: ");
+  Serial.println(UVValueID);
+#endif
+
+  delay(2000);
 
 }
