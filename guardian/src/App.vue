@@ -398,7 +398,7 @@ export default {
     },
     toggleAtmosphericPressure() {
       console.log(this.showAtmosphericPressure)
-      this.showAtmosphericPressure = !this.showAltitude
+      this.showAtmosphericPressure = !this.showAtmosphericPressure
     }
   }
 };
