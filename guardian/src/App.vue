@@ -8,8 +8,8 @@
       </b-jumbotron>
     </div>
     <div class="row">
-            <div class="col-sm-6"> <!-- Temperature Column -->
-                <div class="card text-white bg-warning mb-3" height=1000px style="max-width: 18rem;">
+            <div class="col-sm-4"> <!-- Temperature Column -->
+              <div class="card text-white mb-3" v-bind:class="classObject" height=1000px style="max-width: 18rem;">
                     <div style="font-size: 20px;" class="card-header">Temperature</div>
                     <ToggleButton 
                       @change="toggleTemperature"
@@ -36,8 +36,8 @@
                 High Temperature
              </b-alert>
              
-            <div class="col-sm-6"> <!-- Humidity Column -->
-                <div class="card text-white bg-primary mb-3" style="max-width: 18rem;">
+            <div class="col-sm-4"> <!-- Humidity Column -->
+                <div class="card text-white mb-3" v-bind:class="{ 'bg-primary': true}" style="max-width: 18rem;">
                     <div style="font-size: 20px;" class="card-header">Humidity</div>
                      <ToggleButton 
                       @change="toggleHumidity"
@@ -55,7 +55,7 @@
                 </div>
             </div>
 
-            <div class="col-sm-6"> <!-- Carbon Dioxide Column -->
+            <div class="col-sm-4"> <!-- Carbon Dioxide Column -->
                 <div class="card text-black bg-light mb-3" style="max-width: 18rem;">
                     <div style="font-size: 20px;" class="card-header">Carbon Dioxide</div>
                      <ToggleButton 
@@ -73,7 +73,7 @@
                     </div>
                 </div>
             </div>
-             <div class="col-sm-6"> <!-- Total Volatile Column -->
+             <div class="col-sm-4"> <!-- Total Volatile Column -->
                 <div class="card text-black bg-success mb-3" style="max-width: 18rem;">
                     <div style="font-size: 20px;" class="card-header">Total Volatile Organic Compound</div>
                      <ToggleButton 
@@ -108,6 +108,8 @@ export default {
   },
   data() {
     return {
+      humidity: 20,
+      safeTemperature: true,
       temperatureData: [],
       humidityData: [],
       carbonDioxideData: [],
@@ -143,7 +145,17 @@ export default {
       showDismissibleAlert: false
     }
   },
-
+  computed: {
+    classObject: function(){
+      return {
+        'bg-warning': this.safeTemperature, 
+        'bg-danger': !this.safeTemperature
+      }
+    }
+  },
+  watch: {
+    
+  },
   created() {
     const tempRef = database.ref('DHT11').child('temperature')
     const humRef = database.ref('DHT11').child('humidity')
@@ -156,11 +168,7 @@ export default {
       let data = querySnapshot.val();
       let value = Object.values(data)
     
-      if (this.temperatureData > 25) {
-        this.showDismissibleAlert = true;
-      } else {
-        this.showDismissibleAlert = false;
-      }
+      console.log(this.safeTemperature)
       var date = new Date()
       var hours = date.getHours()
       var minutes = date.getMinutes()
@@ -172,6 +180,13 @@ export default {
       this.temperatureData.push({ x : time, y : value.toString()})
       if (this.temperatureData.length > 8) {
         this.temperatureData = this.temperatureData.slice(this.temperatureData.length - 8, this.temperatureData.length)
+      }
+       if (this.temperatureData[this.temperatureData.length - 1].y >= 24.8 ) {
+        this.safeTemperature = false;
+        this.showDismissibleAlert = true;
+      } else {
+        this.safeTemperature = true;
+        this.showDismissibleAlert = false;
       }
       this.$refs.temperatureChart.updateSeries([{
         data: this.temperatureData
@@ -286,5 +301,8 @@ background-size: cover;
  b-jumbotron {
   width: 50%;
   }
-
+  .card {
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
+  }
 </style>
