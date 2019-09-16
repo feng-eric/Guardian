@@ -7,4 +7,6 @@ Various sensors such as temperature/humidity sensors, atmospheric sensors, UV, a
 
 The data that is stored in Firebase appears on the user interface where values for each type of data is displayed in real time. Users can choose to display the most recent data or see a collection of past data visualized on a chart. When the threshold exceeds for a certain type of data, the UI will turn red and an alert will appear indicating that the firefighter is in critical conditions.
 
-Link to Devpost: https://devpost.com/software/guardian-2n7q3s
+[Link to Devpost](https://devpost.com/software/guardian-2n7q3s)
+
+
