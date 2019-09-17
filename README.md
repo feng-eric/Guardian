@@ -1,4 +1,6 @@
 # Guardian
+
+![Guardian User Interface](https://challengepost-s3-challengepost.netdna-ssl.com/photos/production/software_photos/000/840/765/datas/gallery.jpg)
 This repository contains all source code and dependencies for Guardian.
 
 Guardian is a novel approach to firefighter safety by utilizing the power of IOT to track environmental vitals and transmitting this data in an easy, readable format to Google Firebase where it is then retrieved and processed in an innovative user interface.
