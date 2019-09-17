@@ -2,7 +2,7 @@
 
 ![Guardian User Interface](https://challengepost-s3-challengepost.netdna-ssl.com/photos/production/software_photos/000/840/765/datas/gallery.jpg)
 
-![Guardian Real-time Dynamic Charts](hhttps://challengepost-s3-challengepost.netdna-ssl.com/photos/production/software_photos/000/840/764/datas/gallery.jpg)
+![Guardian Real-time Dynamic Charts](https://challengepost-s3-challengepost.netdna-ssl.com/photos/production/software_photos/000/840/764/datas/gallery.jpg)
 
 This repository contains all source code and dependencies for Guardian.
 
